@@ -1,9 +1,6 @@
 ##CS2450
 from classes import Operators
 
-
-
-
 def LoadMemory(file, memory):
     newMemory = []
     with open(file, "r") as f:
@@ -20,12 +17,22 @@ def CheckMemory(memory):
             print("The file you loaded is incompatible")
 
 
+def ValidateLine(line):
+    #print(type(line))
+    if line[0] not in ["+", "-"]:
+        raise Exception("first character of line no + or -")
+    if not line[1:].isdigit():
+        raise Exception("A none digit was detected in the line")
+    if len(line) > 5:
+        raise Exception("line", line, "is to long")
+
+
 def Run(memory):
     arithmetic = Operators.Arithmetic()
     control = Operators.Control()
     inOut = Operators.InOut()
     loadStore = Operators.LoadStore()
-    accumulator = 0
+    accumulator = "+0000"
     memoryLoc = 0
 
 
@@ -62,6 +69,12 @@ def Run(memory):
                     break
                 case _:
                     print("Loaded program contains invalid command")
+
+            if len(accumulator) > 5:
+                accumulator = f"+{accumulator[-4:]}"
+
+            ValidateLine(accumulator)
+
             if memoryLoc == prevMem:
                 memoryLoc += 1
 

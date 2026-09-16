@@ -112,9 +112,10 @@ class Arithmetic:
         result = num1 + num2
 
         if result >= 0:
-             result = f"+ {result}"
+             result = f"+{result}"
         else:
              result = str(result)
+
         return result
 
 
@@ -137,7 +138,7 @@ class Arithmetic:
         result = num2 - num1
 
         if result >= 0:
-             result = f"+ {result}"
+             result = f"+{result}"
         else:
              result = str(result)
         return result
@@ -162,7 +163,7 @@ class Arithmetic:
         result = num2/num1
 
         if result >= 0:
-             result = f"+ {result}"
+             result = f"+{result}"
         else:
              result = str(result)
         return result
@@ -187,7 +188,7 @@ class Arithmetic:
         result = num2 * num1
 
         if result >= 0:
-             result = f"+ {result}"
+             result = f"+{result}"
         else:
              result = str(result)
         return result
