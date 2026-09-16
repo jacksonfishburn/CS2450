@@ -1,29 +1,16 @@
 ##CS2450
-from classes import Arithmetic, Control, InOut, LoadStore
-
-
-def main():
-    
-    fileSelect = input("enter the file path you would like to load into memory")
-    
-    memory = []
-    for i in range(0, 100):
-        memory.append(None)
-    
-    #print(memory)
-    memory = LoadMemory(fileSelect, memory)
-    CheckMemory(memory)
-
-    Run(memory)
+from classes import Operators
 
 
 
-main()
 
 def LoadMemory(file, memory):
+    newMemory = []
     with open(file, "r") as f:
-        for i in f:
-            memory[i] = i
+        newMemory = f.readlines()
+        newMemory = [i.strip() for i in newMemory]
+        for i in range(0, len(newMemory)):
+            memory[i] = newMemory[i]
     return memory
 
 
@@ -34,10 +21,10 @@ def CheckMemory(memory):
 
 
 def Run(memory):
-    arithmetic = Arithmetic.Arithmetic()
-    control = Control.Control()
-    inOut = InOut.InOut()
-    loadStore = LoadStore.LoadStore()
+    arithmetic = Operators.Arithmetic()
+    control = Operators.Control()
+    inOut = Operators.InOut()
+    loadStore = Operators.LoadStore()
     accumulator = 0
     memoryLoc = 0
 
@@ -49,7 +36,8 @@ def Run(memory):
             cmd = i[1] + i[2]
             match cmd:
                 case "10":
-                    memory[memoryLoc] = inOut.read_input(memory)
+                    loc, data = inOut.read_input(i)
+                    memory[loc] = data
                 case "11":
                     inOut.write_output(memory, i)
                 case "20":
@@ -76,3 +64,23 @@ def Run(memory):
                     print("Loaded program contains invalid command")
             if memoryLoc == prevMem:
                 memoryLoc += 1
+
+
+
+def main():
+    
+    fileSelect = input("enter the file path you would like to load into memory")
+    
+    memory = []
+    for i in range(0, 100):
+        memory.append("+0000")
+    
+
+    memory = LoadMemory(fileSelect, memory)
+    CheckMemory(memory)
+
+    Run(memory)
+
+
+
+main()
