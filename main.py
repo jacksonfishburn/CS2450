@@ -1,4 +1,3 @@
-##CS2450
 from classes import Operators
 
 def LoadMemory(file, memory):
