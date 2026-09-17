@@ -3,14 +3,19 @@ class Control:
         pass
 
     def Branch(self,command):
-        loc = command[3] + command[4]
-        loc = int(loc)
+        ##loc = command[3] + command[4]
+        ##loc = int(loc)
+
+        loc = int(command[3:])
+
+        if loc > 99 or loc < 0: ## checks to make sure a valid location was given
+            raise IndexError("Memory address out of bounds")
         return loc
 
     def BranchNeg(self, command, fail):
         if command[0] == "-":
             loc = command[3] + command[4]
-            return loc
+            return int(loc)
         else:
             return fail
 
@@ -18,7 +23,7 @@ class Control:
     def BranchZero(self, command, accum, fail):
         if accum == 0:
             loc = command[3] + command[4]
-            return loc
+            return int(loc)
         else:
             return fail
 """
@@ -52,10 +57,15 @@ class InOut:
     
     def write_output(self, memory, command):
         """WRITE = 11 Write a word from a specific location in memory to screen"""
-        ##write output to memory. Does that need to be done here? Or another function?
         
-        location = command[3] + command[4]
-        location = int(location)
+        ##location = command[3] + command[4]
+        ##location = int(location)
+
+        location = int(command[3:])
+        
+        if location > 99 or location < 0:
+            raise IndexError("Memory address out of bounds")
+
 
         message = memory[location]
         ## this function could return true or false if the write was successful or not.
@@ -74,15 +84,27 @@ class LoadStore:
     def load(self, command, memory):
         # 20 load from memory into accumulator
         # acc = registers[i] 
-        location = command[3] + command[4]
-        location = int(location)
+        ##location = command[3] + command[4]
+        ##location = int(location)
+        location = int(command[3:])
+    
+        if location > 99 or location < 0:
+            raise IndexError("Memory address out of bounds")
+
         return memory[location]
 
     def store(self, command, memory, accumulator):
         # 21 load from accumulator into memory
         # registers[i] = acc
-        location = command[3] + command[4]
-        location = int(location)
+        ##location = command[3] + command[4]
+        ##location = int(location)
+        location = int(command[3:])
+    
+        if location > 99 or location < 0:
+            raise IndexError("Memory address out of bounds")
+
+        int(accumulator)  ##this is to check if the accumulator is a valid number. If not, it will throw an error.
+
         memory[location] = accumulator
         return memory
 
@@ -92,6 +114,13 @@ class LoadStore:
 class Arithmetic:
     def __init__(self):
         pass
+
+    def format_word(self, value):
+        # Helper method to format any integer into a valid BasicML word
+        if int(value) >= 0:
+            return str(f"+{str(value).zfill(4)}")
+        else:
+            return str(f"-{str(abs(value)).zfill(4)}")
 
     def add(self, command, memory, accumulator):
         #result stays in accumulator
@@ -111,11 +140,7 @@ class Arithmetic:
 
         result = num1 + num2
 
-        if result >= 0:
-             result = f"+{result}"
-        else:
-             result = str(result)
-
+        result = self.format_word(result)  # Ensure the result is formatted correctly
         return result
 
 
@@ -137,10 +162,7 @@ class Arithmetic:
 
         result = num2 - num1
 
-        if result >= 0:
-             result = f"+{result}"
-        else:
-             result = str(result)
+        result = self.format_word(result)  # Ensure the result is formatted correctly
         return result
 
 
@@ -160,12 +182,9 @@ class Arithmetic:
         else:
             num2 = -1 * int(num2[1:])
 
-        result = num2/num1
+        result = num2//num1 ##takes off any decimal places.
 
-        if result >= 0:
-             result = f"+{result}"
-        else:
-             result = str(result)
+        result = self.format_word(result)  # Ensure the result is formatted correctly
         return result
 
 
@@ -187,8 +206,5 @@ class Arithmetic:
 
         result = num2 * num1
 
-        if result >= 0:
-             result = f"+{result}"
-        else:
-             result = str(result)
+        result = self.format_word(result)  # Ensure the result is formatted correctly
         return result

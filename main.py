@@ -6,7 +6,7 @@ def LoadMemory(file, memory):
     with open(file, "r") as f:
         newMemory = f.readlines()
         newMemory = [i.strip() for i in newMemory]
-        for i in range(0, len(newMemory)):
+        for i in range(0, len(newMemory)): ##This may crash if a file longer than 100 lines is loaded.
             memory[i] = newMemory[i]
     return memory
 
@@ -82,7 +82,7 @@ def Run(memory):
 
 def main():
     
-    fileSelect = input("enter the file path you would like to load into memory")
+    fileSelect = input("Enter the file path you would like to load into memory: ")
     
     memory = []
     for i in range(0, 100):
