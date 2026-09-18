@@ -12,8 +12,8 @@ class Control:
             raise IndexError("Memory address out of bounds")
         return loc
 
-    def BranchNeg(self, command, fail):
-        if command[0] == "-":
+    def BranchNeg(self, command, accum, fail):
+        if accum[0] == "-":
             loc = command[3] + command[4]
             return int(loc)
         else:

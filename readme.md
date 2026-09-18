@@ -18,6 +18,8 @@
 |------------|-----------|-------------|
 | READ       | `+10xx`   | Read a word from the terminal into a specific location in memory |
 | WRITE      | `+11xx`   | Write a word from a specific location in memory to screen |
+| LOAD       | `+20xx`   | Load a word from a specific location in memory into the accumulator |
+| STORE      | `+21xx`   | Store a word from the accumulator into a specific location in memory |
 | ADD        | `+30xx`   | Add a word from a specific location in memory to the word in the accumulator (result stays in the accumulator) |
 | SUBTRACT   | `+31xx`   | Subtract a word from a specific location in memory from the word in the accumulator (result stays in the accumulator) |
 | DIVIDE     | `+32xx`   | Divide the world in the accumulator by a word from a specific location in memory (result stays in the accumulator) |
