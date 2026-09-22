@@ -63,7 +63,7 @@ def Run(memory):
                 case "41":
                     memoryLoc = control.BranchNeg(i, accumulator, prevMem)
                 case "42":
-                    control.BranchZero(i, accumulator, prevMem)
+                    memoryLoc = control.BranchZero(i, accumulator, prevMem)
                 case "43":
                     break
                 case _:

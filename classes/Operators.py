@@ -21,7 +21,7 @@ class Control:
 
 
     def BranchZero(self, command, accum, fail):
-        if accum == 0:
+        if accum[1:] == "0000":
             loc = command[3] + command[4]
             return int(loc)
         else:
