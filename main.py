@@ -11,9 +11,34 @@ def LoadMemory(file, memory):
 
 
 def CheckMemory(memory):
+    idx = -1
+    incomp = [False]
     for i in memory:
-        if i[0] not in ["+", "-"] or (not i[1:].isdigit() or len(i) != 5):
-            print("The file you loaded is incompatible")
+        idx += 1
+        if i == '':
+            incomp.append(f"Empty line at {idx:02d}")
+            incomp[0] = True
+        else:
+            if i[0] not in ["+", "-"]:
+                incomp.append(f"Unsigned at position {idx:02d}")
+                incomp[0] = True
+            if not i[1:].isdigit():
+                incomp.append(f"Not integer at position {idx:02d}")
+                incomp[0] = True
+            if len(i) < 5:
+                incomp.append(f"Line too short at position {idx:02d}")
+                incomp[0] = True
+            elif len(i) > 5:
+                incomp.append(f"Line too long at position {idx:02d}")
+                incomp[0] = True
+    if incomp[0]:
+        print("The file you have loaded is incompatible:")
+        for i in range(1,len(incomp)):
+            print('\t' + incomp[i])
+        return False
+    else:
+        return True
+
 
 
 def ValidateLine(line):
@@ -89,9 +114,10 @@ def main():
     
 
     memory = LoadMemory(fileSelect, memory)
-    CheckMemory(memory)
-
-    Run(memory)
+    if CheckMemory(memory):
+        Run(memory)
+    else:
+        return
 
 
 
