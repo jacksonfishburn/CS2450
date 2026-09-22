@@ -81,20 +81,24 @@ class TestControl(unittest.TestCase):
     # --- BRANCHNEG ---
     def test_branch_neg_success(self):
         # Should branch if accumulator is negative
-        self.assertEqual(self.control.BranchNeg("-4150", 10), 50)
+        accumulator = "-0001"
+        self.assertEqual(self.control.BranchNeg("+4150", accumulator, 10), 50)
         
     def test_branch_neg_failure(self):
+        accumulator = "+0001"
         # Should return 'fail' (previous memory) if accumulator is positive
-        self.assertEqual(self.control.BranchNeg("+4150", 10), 10)
+        self.assertEqual(self.control.BranchNeg("+4150", accumulator, 10), 10)
 
     # --- BRANCHZERO ---
     def test_branch_zero_success(self):
         # Should branch if accumulator is exactly zero
-        self.assertEqual(self.control.BranchZero("+4250", 0, 10), 50)
+        accumulator = "+0000"
+        self.assertEqual(self.control.BranchZero("+4250", accumulator, 10), 50)
         
     def test_branch_zero_failure(self):
+        accumulator = "+0001"
         # Should NOT branch if accumulator is non-zero
-        self.assertEqual(self.control.BranchZero("+4250", 5, 10), 10)
+        self.assertEqual(self.control.BranchZero("+4250", accumulator, 10), 10)
 
 
 class TestLoadStore(unittest.TestCase):
