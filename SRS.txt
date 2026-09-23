@@ -1,0 +1,41 @@
+Software Requirement Specification Document
+
+
+15 Functional Requirements
+1. The system will load a BasicML program into main memory starting at address 00 and storing the instructions in a first in first out manner
+
+2. The system will provide an addressable memory of 100 elements each capable of storing a signed four digit number
+
+3. The system will execute the machine language commands by checking the operation code which will be comprised of the first two numeric digits of each line
+
+4. When the read command is run the system will accept user input from the keyboard and store the entered element into the memory location specified by the last two digits of the read command
+
+5. When the write command is run the system will output the element stored at the memory location specified by the last two digits of the element
+
+6. When the load command is run the system will load the element from the location specified by the last two digits in the element into the accumulator
+
+7. When the store command is run the system will store the element from the accumulator into the memory location specified by the last two digits of the command
+
+8. When the add command is run the system will take the element stored in the memory location specified by the last two digits of the command and add it too the element stored inside the accumulator storing the result in the accumulator. if the result is larger than the expected element length the left most numeric digits will be removed until the element is the correct size
+
+9. When the branch command is run the system will move the location in memory from which it is reading to the location specified by the last two digits of the command
+
+10. When the branch neg command is run the system will move the location in memory from which it is reading to the location specified by the last two digits of the command only if the element in the accumulator is negative
+
+11. When the halt command is run the program will terminate
+
+12. On start the program will ask the user for a text file to load into memory while doing so the program will validate each line ensuring each loaded element is appropriately formatted
+
+13. On start if the text file provided by the user is not valid the program will inform the user that the file is invalid and request a new file
+
+14. When the subtract command is run the system will take the element stored in the memory location specified by the last two digits of the command and subtract it from the element stored inside the accumulator storing the result in the accumulator if the absolute value of the result is larger than the expected element length the left most numeric digits will be removed until the element is the correct size
+
+15. The system will have a memory location separate from the main addressable memory this special location is referred to in this document as the accumulator 
+
+3 Non-functional requirements
+
+1. The system will execute BasicML programs without crashing
+
+2. The system will be specific when communicating what it needs or what has gone wrong while using it
+
+3. The system will run each command in under 0.5 seconds
