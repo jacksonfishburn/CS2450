@@ -53,8 +53,8 @@ class InOut:
         ##1: the starting character is + or -
         ##2: the rest of the input is a number
         ##3: the length of the input is 5 characters total
-        if (data[0] not in ['+', '-']) or (not data[1:].isdigit() or len(data) != 5):
-            raise ValueError("Invalid input. Please enter a valid")
+        if (len(data) != 5 or not data[1:].isdigit() or data[0] not in ['+', '-']):
+            raise ValueError("Invalid input. Please enter a valid number")
 
         
         return int(loc), data
@@ -111,14 +111,15 @@ class Arithmetic:
     def __init__(self):
         pass
 
-    ##add a method to truncate the result in case it becomes too long-------------------------
 
     def format_word(self, value):
-        # Helper method to format any integer into a valid BasicML word
-        if int(value) >= 0:
-            return str(f"+{str(value).zfill(4)}")
+        # Helper method to format any integer into a valid BasicML word and truncate overflows
+        value = int(value)
+        if value >= 0:
+            ## zfill(4) pads small numbers, [-4:] slices off the front of large numbers
+            return f"+{str(value).zfill(4)[-4:]}"
         else:
-            return str(f"-{str(abs(value)).zfill(4)}")
+            return f"-{str(abs(value)).zfill(4)[-4:]}"
 
     def add(self, command, memory, accumulator):
         #result stays in accumulator

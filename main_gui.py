@@ -13,35 +13,6 @@ def LoadMemory(file, memory):
             memory[i] = newMemory[i]
     return memory
 
-def CheckMemory(memory): ## implement this method to display to the GUI console ---------------------------
-    idx = -1
-    incomp = [False]
-    for i in memory:
-        idx += 1
-        if i == '':
-            incomp.append(f"Empty line at {idx:02d}")
-            incomp[0] = True
-        else:
-            if i[0] not in ["+", "-"]:
-                incomp.append(f"Unsigned at position {idx:02d}")
-                incomp[0] = True
-            if not i[1:].isdigit():
-                incomp.append(f"Not integer at position {idx:02d}")
-                incomp[0] = True
-            if len(i) < 5:
-                incomp.append(f"Line too short at position {idx:02d}")
-                incomp[0] = True
-            elif len(i) > 5:
-                incomp.append(f"Line too long at position {idx:02d}")
-                incomp[0] = True
-    if incomp[0]:
-        print("The file you have loaded is incompatible:")
-        for i in range(1,len(incomp)):
-            print('\t' + incomp[i])
-        return False
-    else:
-        return True
-
 def ValidateLine(line):
     if line[0] not in ["+", "-"]:
         raise Exception("first character of line no + or -")
@@ -78,16 +49,16 @@ class UVSimGUI:
         ctrl_frame = tk.Frame(self.root, pady=10)
         ctrl_frame.pack(side=tk.TOP, fill=tk.X)
 
-        ## buttons to load file and step through program
-
-        ##gray out buttons that aren't needed until file is loaded -------------------------------
-
+        ##button to load a file
         tk.Button(ctrl_frame, text="Load File", command=self.load_file).pack(side=tk.LEFT, padx=5)
-        tk.Button(ctrl_frame, text="Step", command=self.step_execution).pack(side=tk.LEFT, padx=5)
 
-        ## buttons to run and reset the program
-        self.btn_run = tk.Button(ctrl_frame, text="Run", command=self.toggle_run)
+        ##button to run and step through it. Grayed out until needed
+        self.btn_step = tk.Button(ctrl_frame, text="Step", command=self.step_execution, state="disabled")
+        self.btn_step.pack(side=tk.LEFT, padx=5)
+        self.btn_run = tk.Button(ctrl_frame, text="Run", state="disabled", command=self.toggle_run)
         self.btn_run.pack(side=tk.LEFT, padx=5)
+
+        ##button to reset
         tk.Button(ctrl_frame, text="Reset", command=self.reset_sim).pack(side=tk.LEFT, padx=5)
 
         # Registers Frame to show the values of the accumulator, instruction pointer, and loaded file
@@ -100,11 +71,11 @@ class UVSimGUI:
         self.lbl_file = tk.Label(reg_frame, text="Loaded File: None", font=("Consolas", 14))
         self.lbl_file.pack(side=tk.LEFT, padx=15)
 
-        # Main Display Pane (Memory left, Output right)
+        ## Main Display Pane (Memory left, Output right)
         pane = tk.PanedWindow(self.root, orient=tk.HORIZONTAL)
         pane.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        # Memory Treeview
+        ## Memory Treeview
         mem_frame = tk.LabelFrame(pane, text="Memory (00-99)")
         pane.add(mem_frame, width=300)
         
@@ -115,21 +86,20 @@ class UVSimGUI:
         self.mem_tree.column("Word", width=120, anchor="center")
         self.mem_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        # Console Output Text Widget
+        ## Console Output Text Widget
         out_frame = tk.LabelFrame(pane, text="Console Output")
         pane.add(out_frame)
         self.console = tk.Text(out_frame, state="disabled", bg="black", fg="green", font=("Consolas", 10))
         self.console.pack(fill=tk.BOTH, expand=True)
 
+        ## method to log to the gui console
     def log(self, message):
         self.console.config(state="normal")
         self.console.insert(tk.END, message + "\n")
         self.console.see(tk.END)
         self.console.config(state="disabled")
 
-        ##make a log error state later ----------------------------------
-
-        ## refresh the display to show  updated values
+        ## refresh the display to show updated values
     def _refresh_display(self):
         self.lbl_acc.config(text=f"Accumulator: {self.accumulator}")
         self.lbl_ip.config(text=f"Instruction Pointer: {self.memoryLoc:02d}")
@@ -138,23 +108,64 @@ class UVSimGUI:
         for i, word in enumerate(self.memory):
             self.mem_tree.insert("", tk.END, values=(f"{i:02d}", word))
 
-        ##method to load a file
-    def load_file(self):
-        filepath = filedialog.askopenfilename(title="Select BasicML File")
-        if filepath:
-            self.memory = ["+0000"] * 100
-            self.memory = LoadMemory(filepath, self.memory) ## loads memory from file and uses what we already have in load memory to check it.
-
-            filename = os.path.basename(filepath) ##gets name of file to display in console
-            
-            if CheckMemory(self.memory): ##uses the check memory method to see if the file is compatible
-                self.reset_sim()
-                self.lbl_file.config(text=f"Loaded File: {filename}", fg="green")
-                self.log(f"Successfully loaded {filename}.")
+        ## method to check the memory for errors
+    def check_memory(self):
+            idx = -1
+            incomp = [False]
+            for i in self.memory:
+                idx += 1
+                if i == '':
+                    incomp.append(f"Empty line at {idx:02d}")
+                    incomp[0] = True
+                else:
+                    if i[0] not in ["+", "-"]:
+                        incomp.append(f"Unsigned at position {idx:02d}")
+                        incomp[0] = True
+                    if not i[1:].isdigit():
+                        incomp.append(f"Not integer at position {idx:02d}")
+                        incomp[0] = True
+                    if len(i) < 5:
+                        incomp.append(f"Line too short at position {idx:02d}")
+                        incomp[0] = True
+                    elif len(i) > 5:
+                        incomp.append(f"Line too long at position {idx:02d}")
+                        incomp[0] = True
+                        
+            if incomp[0]:
+                ## Route all error printing to the GUI console
+                self.log("The file you have loaded is incompatible:")
+                for i in range(1, len(incomp)):
+                    self.log('\t' + incomp[i])
+                return False
             else:
-                self.lbl_file.config(text=f"Error with file: {filename}", fg="red") ##gives an error message
-                self.log(f"Failed to load {filename}. Check terminal for errors.") 
-                ## adjust the code to show the errors in the file in the gui rather than terminal ------------------------
+                return True
+
+    ## Method to load a file into memory
+    def load_file(self):
+            filepath = filedialog.askopenfilename(title="Select BasicML File")
+            if filepath:
+                self.memory = ["+0000"] * 100
+                self.memory = LoadMemory(filepath, self.memory) 
+
+                filename = os.path.basename(filepath) 
+                
+                ## resets the simulator every time a new file is loaded.
+                self.reset_sim()
+                if self.check_memory(): 
+                    self.lbl_file.config(text=f"Loaded File: {filename}", fg="green")
+                    self.log(f"Successfully loaded {filename}.")
+                    # Enable the execution buttons now that a file is loaded
+                    self.btn_step.config(state="normal")
+                    self.btn_run.config(state="normal")
+                    
+                else:
+                    self.lbl_file.config(text=f"Error with file: {filename}", fg="red") 
+                    self.log(f"Failed to load {filename}. Please fix the errors listed above.")
+                    ## disable the execution buttons if file is invalid
+                    self.btn_step.config(state="disabled")
+                    self.btn_run.config(state="disabled")
+                    ##this refreshed the display to show the errors in the memory so the user can know what to change
+                    self._refresh_display()
 
     def reset_sim(self): ##clears out the memory, accumulator, memory location, and console. Does not clear loaded file.
         self.is_running = False
@@ -196,18 +207,17 @@ class UVSimGUI:
                 case "10":
                     loc = int(i[3:5])
                     ##pop up box to get user input
-                    ##add protection to make sure input isn't empty or invalid--------------------------------
                     raw_data = simpledialog.askstring("Input", f"Enter 5-character word for loc {loc:02d}:", parent=self.root)
                     
                     if raw_data is not None:
                         try:
-                            # Pass the GUI input directly to the read_input method for validation and formatting
+                            ## Pass the GUI input directly to the read_input method for validation and formatting
                             target_loc, formatted_data = self.inOut.read_input(i, raw_data)
                             self.memory[target_loc] = formatted_data
                         except ValueError as e:
+                            ## If user enters invalid, the program will step back one instruction to allow re-entry
+                            ## Also shows a message in the console
                             self.log(str(e))
-                            # If user enters invalid, the program will step back one instruction to allow re-entry
-                            # Also shows a message in the console
                             prevMem -= 1
                     else:
                         self.log("Input cancelled. Halting execution.")
