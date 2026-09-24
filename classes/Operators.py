@@ -3,8 +3,6 @@ class Control:
         pass
 
     def Branch(self,command):
-        ##loc = command[3] + command[4]
-        ##loc = int(loc)
 
         loc = int(command[3:])
 
@@ -38,29 +36,32 @@ class InOut:
     def __init__(self):
         pass
 
-    def read_input(self,originalCmd):
+    def read_input(self,originalCmd, data):
         """READ 10 Read a word from the keyboard into a specific location in memory"""
-        data = input("Enter valid input ex.(+1234, -1234): ")
 
         loc = originalCmd[3] + originalCmd[4]
+
+        data = data.strip() ##remove whitespace
+
+        # Automatically format and pad numbers
+        if data.isdigit():
+            data = f"+{data.zfill(4)}"
+        elif data.startswith("-") and data[1:].isdigit():
+            data = f"-{data[1:].zfill(4)}"
         
         ##checks if 
         ##1: the starting character is + or -
         ##2: the rest of the input is a number
         ##3: the length of the input is 5 characters total
         if (data[0] not in ['+', '-']) or (not data[1:].isdigit() or len(data) != 5):
-            print("Invalid input. Please enter a valid signed integer.")
-            return self.read_input(originalCmd)  # Recursively call read_input until valid input is provided
+            raise ValueError("Invalid input. Please enter a valid")
 
         
         return int(loc), data
     
-    def write_output(self, memory, command):
+    def write_output(self, memory, command): ##this method may not be needed anymore with the new gui
         """WRITE = 11 Write a word from a specific location in memory to screen"""
         
-        ##location = command[3] + command[4]
-        ##location = int(location)
-
         location = int(command[3:])
         
         if location > 99 or location < 0:
@@ -68,8 +69,7 @@ class InOut:
 
 
         message = memory[location]
-        ## this function could return true or false if the write was successful or not.
-        ##print("Memory Location: ", location, "Message: ", message)
+
         print(message)
 
 
@@ -83,9 +83,7 @@ class LoadStore:
 
     def load(self, command, memory):
         # 20 load from memory into accumulator
-        # acc = registers[i] 
-        ##location = command[3] + command[4]
-        ##location = int(location)
+
         location = int(command[3:])
     
         if location > 99 or location < 0:
@@ -95,9 +93,7 @@ class LoadStore:
 
     def store(self, command, memory, accumulator):
         # 21 load from accumulator into memory
-        # registers[i] = acc
-        ##location = command[3] + command[4]
-        ##location = int(location)
+
         location = int(command[3:])
     
         if location > 99 or location < 0:
@@ -114,6 +110,8 @@ class LoadStore:
 class Arithmetic:
     def __init__(self):
         pass
+
+    ##add a method to truncate the result in case it becomes too long-------------------------
 
     def format_word(self, value):
         # Helper method to format any integer into a valid BasicML word
