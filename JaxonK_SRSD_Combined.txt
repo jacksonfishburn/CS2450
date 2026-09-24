@@ -1,0 +1,21 @@
+Functional Requirements
+1. The system shall provide an addressable main memory of 100 elements. Each element shall be capable of storing a signed four-digit number or word.
+2. The system shall prepare an accumulator. The accumulator is a special memory location separate from the main addressable memory.
+3. On start, the system shall intake a user-submitted text file and validate each line to ensure elements are appropriately formatted. 
+4. If the text file is invalid, the system shall handle the errors. It shall inform the user that the file is invalid, explain the errors, and request a new file.
+5. The system shall load the validated BasicML program into main memory starting at address 00 in a first-in, first-out manner.
+6. The system shall execute machine language commands by parsing each word. The operation code will be comprised of the first two numeric digits, and the memory location will be specified by the last two digits.
+7. When the READ operation is called, the system shall accept and validate user input from the keyboard. The entered element will be stored in the memory location specified by the command.
+8. When the WRITE operation is called, the system shall output or display the element stored at the specified memory location.
+9. When the LOAD operation is called, the system shall load the element from the specified memory location into the accumulator.
+10. When the STORE operation is called, the system shall store the element from the accumulator into the specified memory location.
+11. When the ADD command is called, the system shall add the element in the specified memory location to the element in the accumulator, storing the result in the accumulator. If the result exceeds the expected element length, the left-most numeric digits will be removed until the correct size is reached.
+12. When the SUBTRACT command is called, the system shall subtract the memory element from the accumulator and store the result in the accumulator. If the absolute value of the result is too large, the left-most digits will be removed to fit the size limit.
+13. When the MULTIPLY or DIVIDE operations are called, the system shall set the accumulator to the product or quotient of the accumulator and the specified word in memory.
+14. When control commands are run, the system shall move the read location or parse pointer to the specified memory location unconditionally for a BRANCH operation. It shall change the pointer only if the accumulator is negative for a BRANCHNEG operation. It shall change the pointer only if the accumulator is zero for a BRANCHZERO operation.
+15. When the HALT command is called, the system shall stop parsing memory and terminate the program.
+
+Non-Functional Requirements
+1. The system shall be accurate and execute BasicML programs without crashing.
+2. The system shall be intuitive and educational. It must be specific when communicating what it needs or what has gone wrong during use.
+3. The system shall run each command in under 0.5 seconds.
