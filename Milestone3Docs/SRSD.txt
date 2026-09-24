@@ -1,0 +1,29 @@
+Gareth SRSD
+
+Functional Requirements:
+    The system shall prepare a 100 word memory
+    The system shall prepare an accumulator
+    The system shall intake a user submitted file
+    The system shall validate the user submitted file
+    The system shall parse the user submitted file into the memory
+    The system shall validate the memory
+    The system shall parse each word in memory and call the operation specified in the first two digits on the location in memory specified in the last two digits
+    The system shall intake user values when the READ operation is called
+    The system shall validate user values when the Read operation is called
+    The system shall display a value when the WRITE operation is called
+    The system shall set the accumulator to a value in a specified location in memory when the LOAD operation is called
+    The system shall set a specified location in memory to the value in the accumulator when the STORE operation is called
+    The system shall set the accumulator to the sum of a word from a specified location in memory and the value in the accumulator when the ADD operation is called
+    The system shall set the accumulator to the difference of the accumulator and a word from a specified location in memory when the SUBTRACT operation is called
+    The system shall set the accumulator to the quotient of a specified word in memory and the accumulator when the DIVIDE operation is called
+    The system shall set the accumulator to the product of the accumulator and a specified word in memory when the MULTIPLY operation is called
+    The system shall change its parse pointer to a specified location in memory when the BRANCH operation is called
+    The system shall change its parse pointer to a specified location in memory only if the word in the accumulator is negative when the BRANCHNEG operation is called
+    The system shall change its parse pointer to a specified location in memory only if the word in the accumulator is zero when the BRANCHZERO operation is called
+    The system shall stop parsing the memory when the HALT operation is called
+    The system shall handle user errors
+    The system shall explain user errors
+Nonfunctional Requirements:
+    1. The system shall be intuitive
+    2. The system shall be accurate
+    3. The system shall be educational
