@@ -120,6 +120,11 @@ class UVSim:
             case 43:
                 self._HLT()
 
+    def reset(self):
+        """"""
+        self._pointer = -1
+        self._acu = Accumulator()
+
     def _RED(self, location: int):
         """Read a value from the user into a specified location in memory
 

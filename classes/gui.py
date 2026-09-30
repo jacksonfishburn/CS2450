@@ -66,7 +66,7 @@ class GUI:
 
     def _refresh_display(self):
         self.lbl_acc.config(text=f"Accumulator: {self.cpu.get_accumulator()}")
-        self.lbl_ip.config(text=f"Instruction Pointer: {self.cpu.get_pointer()}")
+        self.lbl_ip.config(text=f"Instruction Pointer: {self.cpu.get_pointer() + 1}")
 
         self.mem_tree.delete(*self.mem_tree.get_children())
         for i, word in enumerate(self.cpu.get_memory()):
@@ -107,10 +107,7 @@ class GUI:
                 self._refresh_display()
 
     def reset_sim(self):
-        self.is_running = False
-        self.btn_run.config(text="Run")
-        self.memoryLoc = 0
-        self.accumulator = "+0000"
+        self.cpu.reset()
         self._refresh_display()
         self.console.config(state="normal")
         self.console.delete(1.0, tk.END)
@@ -132,6 +129,7 @@ class GUI:
             self.root.after(1, self.run_cycle)
 
     def step_execution(self):
+        self._refresh_display()
         if self.cpu.get_pointer() >= 100:
             return True
         try:
@@ -158,5 +156,4 @@ class GUI:
             self.btn_run.config(text="Run", state="disabled") ##changed to grey out buttons so user doesn't run file from incorrect memory location.
             self.btn_step.config(state="disabled")
             return True
-        self._refresh_display()
         return False
