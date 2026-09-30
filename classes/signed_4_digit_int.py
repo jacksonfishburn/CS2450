@@ -8,11 +8,13 @@ class S4DI:
         Args:
             word (str | int, optional): Value of signed 4 digit integer. Defaults to 0.
         """
-        try:
-            self._word = self._validate(word)
-        except ValueError as e:
-            print(f'{e}\nDefaulting value to +0000')
-            self._word = "+0000"
+        # try:
+        #     self._word = self._validate(word)
+        # except ValueError as e:
+        #     print(f'{e}\nDefaulting value to +0000')
+        #     self._word = "+0000"
+
+        self._word = self._validate(word) ##was causing issues with the GUI.
 
     def _validate(self, word: str | int) -> str:
         """Validate word as a Signed 4-Digit Integer
@@ -28,6 +30,9 @@ class S4DI:
             str: Formatted word
         """
         if type(word) is str:
+            word = word.strip()
+            if not word:
+                raise ValueError("Input cannot be empty.")
             try:
                 word = int(word)
             except:

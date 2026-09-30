@@ -82,7 +82,8 @@ class GUI:
             try:
                 self.cpu.load_memory(new)
                 check_memory = True
-            except:
+            except Exception as e:
+                self.log(f"Validation Error: {str(e)}")
                 check_memory = False
 
             filename = os.path.basename(filepath) 
@@ -98,7 +99,7 @@ class GUI:
                 
             else:
                 self.lbl_file.config(text=f"Error with file: {filename}", fg="red") 
-                self.log(f"Failed to load {filename}. Please fix the errors listed above.")
+                self.log(f"Failed to load {filename}. Please check the file for errors.")
                 ## disable the execution buttons if file is invalid
                 self.btn_step.config(state="disabled")
                 self.btn_run.config(state="disabled")
@@ -141,7 +142,7 @@ class GUI:
                 try:
                     self.cpu.set_memory_at(e.location, S4DI(raw_data))
                 except ValueError as v:
-                    self.log(str(e))
+                    self.log(str(v))
                     self.cpu.go_back()
             else:
                 self.log("Input cancelled. Halting execution.")
@@ -153,7 +154,9 @@ class GUI:
         except Halted:
             self.log("Program HALT reached")
             self.is_running = False
-            self.btn_run.config(text="Run")
+            ##self.btn_run.config(text="Run")
+            self.btn_run.config(text="Run", state="disabled") ##changed to grey out buttons so user doesn't run file from incorrect memory location.
+            self.btn_step.config(state="disabled")
             return True
         self._refresh_display()
         return False
