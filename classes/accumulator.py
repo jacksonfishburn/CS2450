@@ -1,4 +1,4 @@
-from signed_4_digit_int import S4DI
+from classes.signed_4_digit_int import S4DI
 
 class Accumulator:
     """A class used to represent an Accumulator

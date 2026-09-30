@@ -2,8 +2,8 @@ import tkinter as tk
 from tkinter import filedialog, simpledialog, ttk
 import os
 
-from uvsim import UVSim, NeedValue, GotValue, Halted
-from signed_4_digit_int import S4DI
+from classes.uvsim import UVSim, NeedValue, GotValue, Halted
+from classes.signed_4_digit_int import S4DI
 
 class GUI:
     def __init__(self, root):

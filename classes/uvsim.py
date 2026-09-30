@@ -1,6 +1,6 @@
-from signed_4_digit_int import S4DI
-from memory import Memory
-from accumulator import Accumulator
+from classes.signed_4_digit_int import S4DI
+from classes.memory import Memory
+from classes.accumulator import Accumulator
 
 class NeedValue(Exception):
     """A solution for requesting a value from the GUI using exceptions. (Probably a bastard use case)
