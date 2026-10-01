@@ -1,0 +1,2 @@
+Add GUI specifications
+Change display current command to be display current pointer
