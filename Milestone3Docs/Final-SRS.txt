@@ -1,2 +1,42 @@
 Add GUI specifications
 Change display current command to be display current pointer
+
+Final Combined SRS Document
+Combined from documents MG and JJ
+
+Functional Requirements
+1 The program shall display all relevant information in a GUI:
+    1.1 Memory: 100 word addressable memory (addresses 00 through 99), with each word holding a signed 4-digit integer
+    1.2 Current Pointer: The memory address of the instruction currently being processed (the instruction pointer)
+    1.3 Accumulator Value: The value currently stored in the accumulator, which is a special memory location separate from main memory
+    1.4 Loaded File: The name of the currently loaded file, shown in green if valid and red if invalid
+    1.5 Console: Program output and status messages, including the final halt message
+2 The program shall provide the following GUI controls and behaviors:
+    2.1 Load File: Opens a file chooser for the user to select a .txt program
+    2.2 Step: Executes a single instruction; disabled until a valid file is loaded
+    2.3 Run: Continues executing instructions until halted; disabled until a valid file is loaded. While running, the button changes to Pause, which suspends execution when clicked
+    2.4 Reset: Stops any run in progress and clears the console. The program must be reloaded to start over
+    2.5 Input Dialog: When a READ is executed, a dialog prompts the user for a signed 4-digit integer (+xxxx or -xxxx). Canceling the dialog stops the program
+3 The program shall be able to execute the following commands, parsing each word so that the first two digits are the operation code and the last two digits are the memory location:
+    3.1 Read: Accept and validate user input, then store it in the specified memory location
+    3.2 Write: Display the word at the specified memory location in the console as OUTPUT
+    3.3 Load: Load the word from the specified memory location into the accumulator
+    3.4 Store: Store the word from the accumulator into the specified memory location
+    3.5 Add: Add the word at the specified memory location to the accumulator, leaving the result in the accumulator. If the result exceeds four digits, the left-most digits are removed until it fits
+    3.6 Subtract: Subtract the word at the specified memory location from the accumulator, leaving the result in the accumulator. If the result exceeds four digits, the left-most digits are removed until it fits
+    3.7 Divide: Divide the accumulator by the word at the specified memory location, leaving the quotient in the accumulator
+    3.8 Multiply: Multiply the accumulator by the word at the specified memory location, leaving the product in the accumulator
+    3.9 Branch: Unconditionally move the instruction pointer to the specified memory location
+    3.10 BranchNeg: Move the instruction pointer to the specified memory location only if the accumulator is negative
+    3.11 BranchZero: Move the instruction pointer to the specified memory location only if the accumulator is zero
+    3.12 Halt: Stop parsing memory, terminate the program, and display "Program HALT reached" in the console
+4 The program shall intake a user-submitted .txt file and:
+    4.1 Validate that each line is a signed 4-digit integer
+    4.2 Inform the user if the file is invalid, explain the errors, and allow a new file to be chosen
+    4.3 Input the validated program into memory starting at address 00, with a program of n instructions occupying addresses 00 through n-1
+    4.4 Run the loaded program, either one instruction at a time or continuously
+
+Non Functional Requirements
+1. The system shall be accurate and execute BasicML programs without crashing.
+2. The system shall be intuitive and educational. It must be specific when communicating what it needs or what has gone wrong during use.
+3. The system shall run each command in under 0.5 seconds.

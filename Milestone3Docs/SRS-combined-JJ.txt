@@ -1,4 +1,7 @@
-SRSD combined from J and J
+Semi Final Combined SRS Document from Jackson and Jaxon
+Done by Matthew and Gareth
+Document JJ
+
 Functional Requirements
 1 The program shall display all relevant information:
     1.1 Memory: 100 word addressable w/ signed 4-digit integers
