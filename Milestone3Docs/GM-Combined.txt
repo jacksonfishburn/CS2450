@@ -1,0 +1,29 @@
+SRSD combined from J and J
+Functional Requirements
+1 The program shall display all relevant information:
+    1.1 Memory: 100 word addressable w/ signed 4-digit integers
+    1.2 Current Command: Command currently being processed
+    1.3 Accumulator Value: Value currently stored in the Accumulator.
+2 The program shall be able to execute the following commands:
+    2.1 Read: Read a value from the user at input it into a specified location in Memory
+    2.2 Write:
+    2.3 Load:
+    2.4 Store:
+    2.5 Add:
+    2.6 Subtract:
+    2.7 Multiply:
+    2.8 Divide:
+    2.9 Branch:
+    2.10 BranchNeg:
+    2.11 BranchZero:
+    2.12: Halt:
+3 The program shall intake a user submitted file and:
+    3.1 Validate
+    3.2 Input into Memory
+    3.3 Run
+Non Functional Requirements
+1. The system shall operate within 0.5 seconds
+2. The system shall have a GUI that is:
+    2.1 Consistent
+    2.2 Easy to use
+    2.3 Informative
