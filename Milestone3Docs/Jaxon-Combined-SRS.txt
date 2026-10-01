@@ -1,4 +1,4 @@
-This is Jaxon's combined with Jackson's
+Jaxon and Jackson combined Gareth's and Matthew's individual SRS into this document.
 
 Functional Requirements
 1. The system shall provide an addressable main memory of 100 elements. Each element shall be capable of storing a signed four-digit number or word.
