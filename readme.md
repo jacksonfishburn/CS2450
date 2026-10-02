@@ -40,8 +40,6 @@ The window shows the accumulator, the instruction pointer, the loaded file name,
     - The sign of the **instruction** has no effect on its function but is conventionally positive.
 4. The third and fourth digits (`+xx__`) describe which position in memory to *operate* on.
     - There are 100 memory slots, from `00` through `99`.
-    - A program with `n` instructions occupies slots up to `n-1`.
-    - Do not operate on memory slots below `n`.
 5. End the program with the `+4300` **instruction**.
 
 ## What are the available operations?
