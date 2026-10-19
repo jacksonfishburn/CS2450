@@ -5,11 +5,46 @@ import os
 from classes.uvsim import UVSim, NeedValue, GotValue, Halted
 from classes.signed_4_digit_int import S4DI
 
+_DEFAULT_PRIMARY = "#4C721D"
+_DEFAULT_OFF = "#FFFFFF"
+
+def load_colors():
+    """Read primary and off colors from color_config.txt. Falls back to UVU green and white."""
+    primary, off = _DEFAULT_PRIMARY, _DEFAULT_OFF
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "color_config.txt")
+    try:
+        with open(path, encoding="utf-8") as f:
+            for raw in f:
+                line = raw.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, value = (part.strip() for part in line.split("=", 1))
+                if len(value) == 6:
+                    value = "#" + value
+                if len(value) != 7 or not value.startswith("#"):
+                    continue
+                try:
+                    int(value[1:], 16)
+                except ValueError:
+                    continue
+                if key.lower() == "primary":
+                    primary = value
+                elif key.lower() == "off":
+                    off = value
+    except OSError:
+        pass
+    return primary, off
+
 class GUI:
     def __init__(self, root):
         self.root = root
         self.root.title("UVSim - BasicML Simulator")
         self.root.geometry('800x600')
+
+        self.primary, self.off = load_colors()
+        self.root.configure(bg=self.primary)
+        self.root.option_add("*background", self.primary)
+        self.root.option_add("*foreground", self.off)
 
         self.cpu = UVSim()
 
@@ -46,10 +81,10 @@ class GUI:
         mem_frame = tk.LabelFrame(pane, text="Memory Editor(00-99)")
         pane.add(mem_frame, width=300)
 
-        self.line_numbers = tk.Text(mem_frame, width=4, padx=3, takefocus=0, state='disabled', font=("Consolas", 11))
+        self.line_numbers = tk.Text(mem_frame, width=4, padx=3, takefocus=0, state='disabled', font=("Consolas", 11), bg=self.off, fg=self.primary)
         self.line_numbers.pack(side=tk.LEFT, fill=tk.Y)
 
-        self.mem_editor = tk.Text(mem_frame, wrap=tk.NONE, undo=True, font=("Consolas", 11))
+        self.mem_editor = tk.Text(mem_frame, wrap=tk.NONE, undo=True, font=("Consolas", 11), bg=self.off, fg=self.primary, insertbackground=self.primary)
         self.mem_editor.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
         # Initial population of 100 placeholder lines
@@ -68,7 +103,7 @@ class GUI:
 
         out_frame = tk.LabelFrame(pane, text="Console Output")
         pane.add(out_frame)
-        self.console = tk.Text(out_frame, state="disabled", bg="black", fg="green", font=("Consolas", 10))
+        self.console = tk.Text(out_frame, state="disabled", bg=self.primary, fg=self.off, font=("Consolas", 10))
         self.console.pack(fill=tk.BOTH, expand=True)
 
     def _update_line_numbers(self, event=None):
@@ -148,7 +183,7 @@ class GUI:
             self.mem_editor.insert("1.0", "\n".join(lines))
             self._update_line_numbers()
             
-            self.lbl_file.config(text=f"Loaded File: {filename}", fg="green")
+            self.lbl_file.config(text=f"Loaded File: {filename}")
             self.log(f"Loaded {filename} into editor. Review, edit, and click Run/Step to execute.")
             
             self.reset_sim()
