@@ -43,8 +43,6 @@ class GUI:
 
         self.primary, self.off = load_colors()
         self.root.configure(bg=self.primary)
-        self.root.option_add("*background", self.primary)
-        self.root.option_add("*foreground", self.off)
 
         self.cpu = UVSim()
 
@@ -54,37 +52,38 @@ class GUI:
         self._refresh_display()
 
     def _build_ui(self):
-        ctrl_frame = tk.Frame(self.root, pady=10)
+        ctrl_frame = tk.Frame(self.root, pady=10, bg=self.primary)
         ctrl_frame.pack(side=tk.TOP, fill=tk.X)
 
-        tk.Button(ctrl_frame, text="Load File", command=self.load_file).pack(side=tk.LEFT, padx=5)
+        button_color = {"bg": self.off, "fg": "black", "activebackground": self.off, "activeforeground": "black"}
+        tk.Button(ctrl_frame, text="Load File", command=self.load_file, **button_color).pack(side=tk.LEFT, padx=5)
         
-        self.btn_step = tk.Button(ctrl_frame, text="Step", command=self.step_execution, state="disabled")
+        self.btn_step = tk.Button(ctrl_frame, text="Step", command=self.step_execution, state="disabled", **button_color)
         self.btn_step.pack(side=tk.LEFT, padx=5)
-        self.btn_run = tk.Button(ctrl_frame, text="Run", state="disabled", command=self.toggle_run)
+        self.btn_run = tk.Button(ctrl_frame, text="Run", state="disabled", command=self.toggle_run, **button_color)
         self.btn_run.pack(side=tk.LEFT, padx=5)
 
-        tk.Button(ctrl_frame, text="Reset", command=self.reset_sim).pack(side=tk.LEFT, padx=5)
+        tk.Button(ctrl_frame, text="Reset", command=self.reset_sim, **button_color).pack(side=tk.LEFT, padx=5)
 
-        reg_frame = tk.Frame(self.root, pady=10)
+        reg_frame = tk.Frame(self.root, pady=10, bg=self.primary)
         reg_frame.pack(side=tk.TOP, fill=tk.X)
-        self.lbl_acc = tk.Label(reg_frame, text=f"Accumulator: {self.cpu.get_accumulator()}", font=("Consolas", 14, "bold"))
+        self.lbl_acc = tk.Label(reg_frame, text=f"Accumulator: {self.cpu.get_accumulator()}", font=("Consolas", 14, "bold"), bg=self.primary, fg=self.off)
         self.lbl_acc.pack(side=tk.LEFT, padx=20)
-        self.lbl_ip = tk.Label(reg_frame, text=f"Instruction Pointer: {self.cpu.get_pointer()}", font=("Consolas", 14))
+        self.lbl_ip = tk.Label(reg_frame, text=f"Instruction Pointer: {self.cpu.get_pointer()}", font=("Consolas", 14), bg=self.primary, fg=self.off)
         self.lbl_ip.pack(side=tk.LEFT, padx=20)
-        self.lbl_file = tk.Label(reg_frame, text="Loaded File: None", font=("Consolas", 14))
+        self.lbl_file = tk.Label(reg_frame, text="Loaded File: None", font=("Consolas", 14), bg=self.primary, fg=self.off)
         self.lbl_file.pack(side=tk.LEFT, padx=15)
 
-        pane = tk.PanedWindow(self.root, orient=tk.HORIZONTAL)
+        pane = tk.PanedWindow(self.root, orient=tk.HORIZONTAL, bg=self.primary)
         pane.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        mem_frame = tk.LabelFrame(pane, text="Memory Editor(00-99)")
+        mem_frame = tk.LabelFrame(pane, text="Memory Editor(00-99)", bg=self.primary, fg=self.off)
         pane.add(mem_frame, width=300)
 
-        self.line_numbers = tk.Text(mem_frame, width=4, padx=3, takefocus=0, state='disabled', font=("Consolas", 11), bg=self.off, fg=self.primary)
+        self.line_numbers = tk.Text(mem_frame, width=4, padx=3, takefocus=0, state='disabled', font=("Consolas", 11))
         self.line_numbers.pack(side=tk.LEFT, fill=tk.Y)
 
-        self.mem_editor = tk.Text(mem_frame, wrap=tk.NONE, undo=True, font=("Consolas", 11), bg=self.off, fg=self.primary, insertbackground=self.primary)
+        self.mem_editor = tk.Text(mem_frame, wrap=tk.NONE, undo=True, font=("Consolas", 11))
         self.mem_editor.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
         # Initial population of 100 placeholder lines
@@ -101,9 +100,9 @@ class GUI:
         self.mem_editor.configure(yscrollcommand=sync_yscroll)
         self.mem_editor.bind("<KeyRelease>", self._update_line_numbers)
 
-        out_frame = tk.LabelFrame(pane, text="Console Output")
+        out_frame = tk.LabelFrame(pane, text="Console Output", bg=self.primary, fg=self.off)
         pane.add(out_frame)
-        self.console = tk.Text(out_frame, state="disabled", bg=self.primary, fg=self.off, font=("Consolas", 10))
+        self.console = tk.Text(out_frame, state="disabled", bg="black", fg="green", font=("Consolas", 10))
         self.console.pack(fill=tk.BOTH, expand=True)
 
     def _update_line_numbers(self, event=None):
