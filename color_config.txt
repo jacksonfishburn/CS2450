@@ -1,0 +1,3 @@
+# Restart the app after editing. Hex only: #RRGGBB or RRGGBB.
+primary=#4C721D
+off=#FFFFFF

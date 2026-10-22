@@ -5,11 +5,44 @@ import os
 from classes.uvsim import UVSim, NeedValue, GotValue, Halted
 from classes.signed_4_digit_int import S4DI
 
+_DEFAULT_PRIMARY = "#4C721D"
+_DEFAULT_OFF = "#FFFFFF"
+
+def load_colors():
+    """Read primary and off colors from color_config.txt. Falls back to UVU green and white."""
+    primary, off = _DEFAULT_PRIMARY, _DEFAULT_OFF
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "color_config.txt")
+    try:
+        with open(path, encoding="utf-8") as f:
+            for raw in f:
+                line = raw.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, value = (part.strip() for part in line.split("=", 1))
+                if len(value) == 6:
+                    value = "#" + value
+                if len(value) != 7 or not value.startswith("#"):
+                    continue
+                try:
+                    int(value[1:], 16)
+                except ValueError:
+                    continue
+                if key.lower() == "primary":
+                    primary = value
+                elif key.lower() == "off":
+                    off = value
+    except OSError:
+        pass
+    return primary, off
+
 class GUI:
     def __init__(self, root):
         self.root = root
         self.root.title("UVSim - BasicML Simulator")
         self.root.geometry('800x600')
+
+        self.primary, self.off = load_colors()
+        self.root.configure(bg=self.primary)
 
         self.cpu = UVSim()
 
@@ -19,31 +52,32 @@ class GUI:
         self._refresh_display()
 
     def _build_ui(self):
-        ctrl_frame = tk.Frame(self.root, pady=10)
+        ctrl_frame = tk.Frame(self.root, pady=10, bg=self.primary)
         ctrl_frame.pack(side=tk.TOP, fill=tk.X)
 
-        tk.Button(ctrl_frame, text="Load File", command=self.load_file).pack(side=tk.LEFT, padx=5)
+        button_color = {"bg": self.off, "fg": "black", "activebackground": self.off, "activeforeground": "black"}
+        tk.Button(ctrl_frame, text="Load File", command=self.load_file, **button_color).pack(side=tk.LEFT, padx=5)
         
-        self.btn_step = tk.Button(ctrl_frame, text="Step", command=self.step_execution, state="disabled")
+        self.btn_step = tk.Button(ctrl_frame, text="Step", command=self.step_execution, state="disabled", **button_color)
         self.btn_step.pack(side=tk.LEFT, padx=5)
-        self.btn_run = tk.Button(ctrl_frame, text="Run", state="disabled", command=self.toggle_run)
+        self.btn_run = tk.Button(ctrl_frame, text="Run", state="disabled", command=self.toggle_run, **button_color)
         self.btn_run.pack(side=tk.LEFT, padx=5)
 
-        tk.Button(ctrl_frame, text="Reset", command=self.reset_sim).pack(side=tk.LEFT, padx=5)
+        tk.Button(ctrl_frame, text="Reset", command=self.reset_sim, **button_color).pack(side=tk.LEFT, padx=5)
 
-        reg_frame = tk.Frame(self.root, pady=10)
+        reg_frame = tk.Frame(self.root, pady=10, bg=self.primary)
         reg_frame.pack(side=tk.TOP, fill=tk.X)
-        self.lbl_acc = tk.Label(reg_frame, text=f"Accumulator: {self.cpu.get_accumulator()}", font=("Consolas", 14, "bold"))
+        self.lbl_acc = tk.Label(reg_frame, text=f"Accumulator: {self.cpu.get_accumulator()}", font=("Consolas", 14, "bold"), bg=self.primary, fg=self.off)
         self.lbl_acc.pack(side=tk.LEFT, padx=20)
-        self.lbl_ip = tk.Label(reg_frame, text=f"Instruction Pointer: {self.cpu.get_pointer()}", font=("Consolas", 14))
+        self.lbl_ip = tk.Label(reg_frame, text=f"Instruction Pointer: {self.cpu.get_pointer()}", font=("Consolas", 14), bg=self.primary, fg=self.off)
         self.lbl_ip.pack(side=tk.LEFT, padx=20)
-        self.lbl_file = tk.Label(reg_frame, text="Loaded File: None", font=("Consolas", 14))
+        self.lbl_file = tk.Label(reg_frame, text="Loaded File: None", font=("Consolas", 14), bg=self.primary, fg=self.off)
         self.lbl_file.pack(side=tk.LEFT, padx=15)
 
-        pane = tk.PanedWindow(self.root, orient=tk.HORIZONTAL)
+        pane = tk.PanedWindow(self.root, orient=tk.HORIZONTAL, bg=self.primary)
         pane.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        mem_frame = tk.LabelFrame(pane, text="Memory Editor(00-99)")
+        mem_frame = tk.LabelFrame(pane, text="Memory Editor(00-99)", bg=self.primary, fg=self.off)
         pane.add(mem_frame, width=300)
 
         self.line_numbers = tk.Text(mem_frame, width=4, padx=3, takefocus=0, state='disabled', font=("Consolas", 11))
@@ -66,7 +100,7 @@ class GUI:
         self.mem_editor.configure(yscrollcommand=sync_yscroll)
         self.mem_editor.bind("<KeyRelease>", self._update_line_numbers)
 
-        out_frame = tk.LabelFrame(pane, text="Console Output")
+        out_frame = tk.LabelFrame(pane, text="Console Output", bg=self.primary, fg=self.off)
         pane.add(out_frame)
         self.console = tk.Text(out_frame, state="disabled", bg="black", fg="green", font=("Consolas", 10))
         self.console.pack(fill=tk.BOTH, expand=True)
@@ -148,7 +182,7 @@ class GUI:
             self.mem_editor.insert("1.0", "\n".join(lines))
             self._update_line_numbers()
             
-            self.lbl_file.config(text=f"Loaded File: {filename}", fg="green")
+            self.lbl_file.config(text=f"Loaded File: {filename}")
             self.log(f"Loaded {filename} into editor. Review, edit, and click Run/Step to execute.")
             
             self.reset_sim()
