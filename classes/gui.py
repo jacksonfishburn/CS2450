@@ -65,6 +65,8 @@ class GUI:
 
         tk.Button(ctrl_frame, text="Reset", command=self.reset_sim, **button_color).pack(side=tk.LEFT, padx=5)
 
+        tk.Button(ctrl_frame, text="Save File", command=self.save_file, **button_color).pack(side=tk.LEFT, padx=5)
+
         reg_frame = tk.Frame(self.root, pady=10, bg=self.primary)
         reg_frame.pack(side=tk.TOP, fill=tk.X)
         self.lbl_acc = tk.Label(reg_frame, text=f"Accumulator: {self.cpu.get_accumulator()}", font=("Consolas", 14, "bold"), bg=self.primary, fg=self.off)
@@ -188,6 +190,21 @@ class GUI:
             self.reset_sim()
             self.btn_step.config(state="normal")
             self.btn_run.config(state="normal")
+
+    def save_file(self):
+        filepath = filedialog.asksaveasfilename(title="Select Save Location", defaultextension=".txt", filetypes=[("Text Files", "*.txt")])
+
+        if not filepath:
+            return
+
+        file = self.cpu.get_memory()
+
+        self.sync_and_validate_memory()
+
+        with open(filepath, 'w') as f:
+            for i in file:
+                f.write(f"{i}\n")
+
 
     def reset_sim(self):
         # 1. Stop any active loops and reset button appearances/states
