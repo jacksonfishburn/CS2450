@@ -197,9 +197,8 @@ class GUI:
         if not filepath:
             return
 
-        file = self.cpu.get_memory()
-
         self.sync_and_validate_memory()
+        file = self.cpu.get_memory()
 
         with open(filepath, 'w') as f:
             for i in file:
