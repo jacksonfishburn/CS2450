@@ -1,22 +1,17 @@
 
-class S4DI:
+class SignedInt:
     """A class used to represent a Signed 4-Digit Integer
     """
-    def __init__(self, word: str | int = 0):
+    def __init__(self, word: int = 0, size = 6):
         """Initialize signed 4 digit integer
 
         Args:
             word (str | int, optional): Value of signed 4 digit integer. Defaults to 0.
         """
-        # try:
-        #     self._word = self._validate(word)
-        # except ValueError as e:
-        #     print(f'{e}\nDefaulting value to +0000')
-        #     self._word = "+0000"
-
+        self.size = size
         self._word = self._validate(word) ##was causing issues with the GUI.
 
-    def _validate(self, word: str | int) -> str:
+    def _validate(self, word: int ) -> str:
         """Validate word as a Signed 4-Digit Integer
 
         Args:
@@ -29,23 +24,18 @@ class S4DI:
         Returns:
             str: Formatted word
         """
-        if type(word) is str:
-            word = word.strip()
-            if not word:
-                raise ValueError("Input cannot be empty.")
-            try:
-                word = int(word)
-            except:
-                raise ValueError(f"Invalid word: {word}")
         if type(word) is int:
-            if (word < -9999) or (word > 9999):
-                return f'{(word % 10000):04d}'
+            if (abs(word) > ((10**self.size)-1)):
+                return f'{(word % (10**self.size)):0{self.size}d}'
             elif word < 0:
-                return f'-{abs(word):04d}'
+                return f'-{abs(word):0{self.size}d}'
             else:
-                return f'+{word:04d}'
+                return f'+{word:0{self.size}d}'
         else:
-            raise TypeError(f"{word} of wrong type: {type(word)}")
+            try:
+                return self._validate(int(word))
+            except TypeError:
+                raise TypeError(f"{word} of wrong type: {type(word)}")
 
     def get_word(self) -> str:
         """Returns word
@@ -61,7 +51,7 @@ class S4DI:
         Returns:
             str:  Either '-' or '+'
         """
-        return int(self._word[0])
+        return self._word[0]
 
     def get_command(self) -> int:
         """Returns the first two digits of the word
@@ -69,7 +59,7 @@ class S4DI:
         Returns:
             int: First two digits describing a command to execute as an integer
         """
-        return int(self._word[1:3])
+        return int(self._word[1:((self.size//2)+1)])
 
     def get_pointer(self) -> int:
         """Returns the last two digits of the word
@@ -77,7 +67,7 @@ class S4DI:
         Returns:
             int: Last two digits describing a location in memory as an integer
         """
-        return int(self._word[3:])
+        return int(self._word[((self.size//2)+1):])
 
     def __str__(self) -> str:
         """Returns a string representation of self

@@ -3,7 +3,7 @@ from tkinter import filedialog, simpledialog, ttk
 import os
 
 from classes.uvsim import UVSim, NeedValue, GotValue, Halted
-from classes.signed_4_digit_int import S4DI
+from classes.signed_int import SignedInt
 
 _DEFAULT_PRIMARY = "#4C721D"
 _DEFAULT_OFF = "#FFFFFF"
@@ -153,7 +153,7 @@ class GUI:
             if self.cpu.get_pointer() > -1 or self.is_running:
                 self.mem_editor.config(state="normal")
                 self.mem_editor.delete("1.0", tk.END)
-                # Convert S4DI objects back to strings
+                # Convert SignedInt objects back to strings
                 self.mem_editor.insert("1.0", "\n".join(str(w) for w in self.cpu.get_memory()))
                 self.mem_editor.config(state="disabled") # Lock
             else:
@@ -266,7 +266,7 @@ class GUI:
             raw_data = simpledialog.askstring("Input", f"Enter Valid Signed 4-digit Integer for location {e.location}:", parent=self.root)
             if raw_data is not None:
                 try:
-                    self.cpu.set_memory_at(e.location, S4DI(raw_data))
+                    self.cpu.set_memory_at(e.location, SignedInt(raw_data))
                 except ValueError as v:
                     self.log(str(v))
                     self.cpu.go_back()
