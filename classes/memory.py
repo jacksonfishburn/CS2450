@@ -47,12 +47,17 @@ class Memory:
             IndexError: If the address is out of range
         """
         if not type(address) is int:
-            raise TypeError(f"Invalid address: {address}")
+            raise TypeError(f"address ({address}) of wrong type: {type(address)}")
         if 0 <= address < self.size:
             if type(new) is SignedInt:
                 self._lis[address] = new
             else:
-                raise TypeError(f"{new} is of invalid type: {type(new)}")
+                try:
+                    self._lis[address] = SignedInt(new, size=self.int_size)
+                except TypeError:
+                    raise TypeError(f"{new} is of invalid type: {type(new)}")
+                except ValueError as e:
+                    raise e
         else:
             raise IndexError(f"{address} out of range")
 

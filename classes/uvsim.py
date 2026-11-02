@@ -61,7 +61,14 @@ class UVSim:
             location (int): The location where the new value is to be set
             new (SignedInt | int | str): The new value being set
         """
-        self._mem.set(location, new)
+        if not type(new) is SignedInt:
+            try:  
+                self._mem.set(location, SignedInt(new, self._mem.int_size))
+            except TypeError as e:
+                raise e
+            except:
+                raise ValueError(f"Invalid signed int: {new}")
+
 
     def get_memory(self) -> list[SignedInt]:
         """Get the memory as a list

@@ -6,6 +6,7 @@ class Accumulator:
     def __init__(self, int_size):
         """Initialize an Accumulator instance
         """
+        self.int_size = int_size
         self._word = SignedInt(size=int_size)
 
     def set_word(self, new: SignedInt ) -> None:
@@ -17,13 +18,18 @@ class Accumulator:
         Raises:
             TypeError: If new cannot be formatted as a SignedInt
         """
-        if type(new) is SignedInt:
-            self._word = new
-        else:
+        if not type(new) is SignedInt:
             try:
-                self._word = SignedInt(new)
+                self._word = SignedInt(new, size=self.int_size)
             except:
                 raise TypeError(f"{new} of wrong type: {type(new)}")
+        elif new.size == self.int_size:
+            try:
+                self._word = SignedInt(int(new), size=self.int_size)
+            except:
+                raise ValueError(f"Invalid signed integer: {new}")
+        else:
+            self._word = new
 
     def add(self, other: SignedInt | int) -> None:
         """Add other to word in accumulator, storing the result

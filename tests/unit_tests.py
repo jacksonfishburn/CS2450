@@ -9,40 +9,40 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.insert(0, parent_dir)
 
-from classes.signed_4_digit_int import S4DI
+from classes.signed_int import SignedInt
 from classes.memory import Memory
 from classes.uvsim import UVSim, NeedValue, GotValue, Halted
 
 
-class TestS4DIAndMemory(unittest.TestCase):
+class Test4SignedIntAndMemory100(unittest.TestCase):
     # --- WORD VALIDATION & MEMORY LOADING ---
-    def test_s4di_valid_creation(self):
-        word = S4DI("+1234")
+    def test_4SignedInt_valid_creation(self):
+        word = SignedInt("+1234", size=4)
         self.assertEqual(str(word), "+1234")
         self.assertEqual(word.get_command(), 12)
         self.assertEqual(word.get_pointer(), 34)
-
-    def test_s4di_invalid_input(self):
+    
+    def test_4SignedInt_invalid_input(self):
         with self.assertRaises(ValueError):
-            S4DI("+ABCD")
+            SignedInt("+ABCD", size=4)
         with self.assertRaises(ValueError):
-            S4DI("")
+            SignedInt("")
 
     def test_memory_load_too_long(self):
         with self.assertRaises(ValueError):
-            Memory(["+0000"] * 101)
+            Memory(["+0000"] * 101, size=100)
 
     def test_memory_out_of_bounds(self):
-        mem = Memory([])
+        mem = Memory([], size=100)
         with self.assertRaises(IndexError):
             mem.at(100)
         with self.assertRaises(IndexError):
             mem.set(-1, "+0000")
 
 
-class TestArithmetic(unittest.TestCase):
+class TestArithmetic100(unittest.TestCase):
     def setUp(self):
-        self.cpu = UVSim()
+        self.cpu = UVSim(memory_size=100)
         # Location 00: Command | Location 10: +0015 | Location 11: -0005
         self.cpu.set_memory_at(10, "+0015")
         self.cpu.set_memory_at(11, "-0005")
@@ -100,30 +100,29 @@ class TestArithmetic(unittest.TestCase):
             self.cpu.step()
 
 
-class TestControl(unittest.TestCase):
+class TestControl100(unittest.TestCase):
     def setUp(self):
-        self.cpu = UVSim()
+        self.cpu = UVSim(memory_size=100)
 
     # --- BRANCH (code 40) ---
-    def test_branch_success(self):
+    def test_branch_success_size100(self):
         self.cpu.set_memory_at(0, "+4050")
         self.cpu.step()
         # sets pointer to location - 1 (49) so the next step() increments it to 50
         self.assertEqual(self.cpu.get_pointer(), 49)
 
-    def test_branch_out_of_bounds(self):
-        self.cpu._BRA(105)
+    def test_branch_out_of_bounds_size100(self):
         with self.assertRaises(IndexError):
-            self.cpu.step()
+            self.cpu._BRA(105)
 
     # --- BRANCHNEG (code 41) ---
-    def test_branch_neg_success(self):
+    def test_branch_neg_success100(self):
         self.cpu.set_memory_at(0, "+4150")
         self.cpu._acu.set_word("-0001")
         self.cpu.step()
         self.assertEqual(self.cpu.get_pointer(), 49)
 
-    def test_branch_neg_failure(self):
+    def test_branch_neg_failure100(self):
         self.cpu.set_memory_at(0, "+4150")
         self.cpu._acu.set_word("+0001")
         self.cpu.step()
@@ -131,28 +130,28 @@ class TestControl(unittest.TestCase):
         self.assertEqual(self.cpu.get_pointer(), 0)
 
     # --- BRANCHZERO (code 42) ---
-    def test_branch_zero_success(self):
+    def test_branch_zero_success100(self):
         self.cpu.set_memory_at(0, "+4250")
         self.cpu._acu.set_word("+0000")
         self.cpu.step()
         self.assertEqual(self.cpu.get_pointer(), 49)
 
-    def test_branch_zero_failure(self):
+    def test_branch_zero_failure100(self):
         self.cpu.set_memory_at(0, "+4250")
         self.cpu._acu.set_word("+0001")
         self.cpu.step()
         self.assertEqual(self.cpu.get_pointer(), 0)
 
     # --- HALT (code 43) ---
-    def test_halt(self):
+    def test_halt100(self):
         self.cpu.set_memory_at(0, "+4300")
         with self.assertRaises(Halted):
             self.cpu.step()
 
 
-class TestLoadStore(unittest.TestCase):
+class TestLoadStore100(unittest.TestCase):
     def setUp(self):
-        self.cpu = UVSim()
+        self.cpu = UVSim(memory_size=100)
         self.cpu.set_memory_at(25, "+1234")
 
     # --- LOAD (code 20) ---
@@ -177,9 +176,9 @@ class TestLoadStore(unittest.TestCase):
             self.cpu.set_memory_at(30, "invalid_word")
 
 
-class TestInOut(unittest.TestCase):
+class TestInOut100(unittest.TestCase):
     def setUp(self):
-        self.cpu = UVSim()
+        self.cpu = UVSim(memory_size=100)
         self.cpu.set_memory_at(15, "+5678")
 
     # --- READ (code 10) ---
