@@ -67,6 +67,8 @@ class GUI:
 
         tk.Button(ctrl_frame, text="Save File", command=self.save_file, **button_color).pack(side=tk.LEFT, padx=5)
 
+        tk.Button(ctrl_frame, text="New Window", command=self.new_window, **button_color).pack(side=tk.LEFT, padx=5)
+
         reg_frame = tk.Frame(self.root, pady=10, bg=self.primary)
         reg_frame.pack(side=tk.TOP, fill=tk.X)
         self.lbl_acc = tk.Label(reg_frame, text=f"Accumulator: {self.cpu.get_accumulator()}", font=("Consolas", 14, "bold"), bg=self.primary, fg=self.off)
@@ -171,10 +173,14 @@ class GUI:
                 
             self._update_line_numbers()
 
+    def new_window(self):
+        GUI(tk.Toplevel(self.root))
+
     def load_file(self):
-        filepath = filedialog.askopenfilename(title="Select BasicML File")
+        filepath = filedialog.askopenfilename(title="Select BasicML File", parent=self.root)
         if filepath:
-            filename = os.path.basename(filepath) 
+            filename = os.path.basename(filepath)
+            self.root.title(f"UVSim - {filename}")
             
             with open(filepath, "r") as f:
                 lines = [line.strip() for line in f.readlines()]
@@ -192,7 +198,7 @@ class GUI:
             self.btn_run.config(state="normal")
 
     def save_file(self):
-        filepath = filedialog.asksaveasfilename(title="Select Save Location", defaultextension=".txt", filetypes=[("Text Files", "*.txt")])
+        filepath = filedialog.asksaveasfilename(title="Select Save Location", defaultextension=".txt", filetypes=[("Text Files", "*.txt")], parent=self.root)
 
         if not filepath:
             return
@@ -233,8 +239,8 @@ class GUI:
             self.run_cycle()
 
     def run_cycle(self):
-        # Stop the loop immediately if the user clicked Pause
-        if not self.is_running: 
+        # Stop the loop immediately if the user clicked Pause or closed this window
+        if not self.is_running or not self.root.winfo_exists():
             return
             
         # Execute exactly one instruction
