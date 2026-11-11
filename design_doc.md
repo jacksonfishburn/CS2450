@@ -10,7 +10,7 @@
 Actor: User  
 System: LoadMemory / CheckMemory in main.py
 
-Goal: Get a BasicML file into the 100-word memory list so Run can execute it.
+Goal: Get a BasicML file into the 250-word memory list so Run can execute it.
 
 Steps:
 1. User enters a file path.
@@ -28,7 +28,7 @@ Goal: Read a signed word from the keyboard into a memory location.
 
 Steps:
 1. Prompt the user for a signed value.
-2. Get the address from the last two digits of the word.
+2. Get the address from the last three digits of the word.
 3. Store the entered value at that address.
 
 ---
@@ -37,7 +37,7 @@ Steps:
 Actor: User  
 System: InOut.read_input  
 
-Goal: Only accept a valid signed 5-character word (+1234 or -1234).
+Goal: Only accept a valid signed 6-character word (+123456 or -123456).
 
 Steps:
 1. Prompt for input.
@@ -55,7 +55,7 @@ Goal: Add a memory value to the accumulator.
 
 Steps:
 1. Parse opcode 30.
-2. Get the address from the last two digits of the word.
+2. Get the address from the last three digits of the word.
 3. Add that memory value to the accumulator.
 4. Put the formatted result back in the accumulator.
 
@@ -69,7 +69,7 @@ Goal: Subtract a memory value from the accumulator.
 
 Steps:
 1. Parse opcode 31.
-2. Get the address from the last two digits of the word.
+2. Get the address from the last three digits of the word.
 3. Subtract that memory value from the accumulator.
 4. Put the formatted result back in the accumulator.
 
@@ -83,7 +83,7 @@ Goal: Multiply the accumulator by a memory value.
 
 Steps:
 1. Parse opcode 33.
-2. Get the address from the last two digits of the word.
+2. Get the address from the last three digits of the word.
 3. Multiply the accumulator by that memory value.
 4. Put the formatted result back in the accumulator.
 
@@ -97,7 +97,7 @@ Goal: Divide the accumulator by a memory value.
 
 Steps:
 1. Parse opcode 32.
-2. Get the address from the last two digits of the word.
+2. Get the address from the last three digits of the word.
 3. Integer-divide the accumulator by that memory value.
 4. Put the formatted result back in the accumulator.
 
@@ -111,7 +111,7 @@ Goal: Copy the accumulator into a memory location.
 
 Steps:
 1. Parse opcode 21.
-2. Get the address from the last two digits of the word.
+2. Get the address from the last three digits of the word.
 3. Confirm the accumulator is a valid number.
 4. Write the accumulator into that memory slot.
 
@@ -125,7 +125,7 @@ Goal: Load a value from memory into the accumulator.
 
 Steps:
 1. Parse opcode 20.
-2. Get the address from the last two digits of the word.
+2. Get the address from the last three digits of the word.
 3. Fetch the value at that address.
 4. Copy it into the accumulator.
 
@@ -139,7 +139,7 @@ Goal: Print a word from memory to the screen.
 
 Steps:
 1. Parse opcode 11.
-2. Get the address from the last two digits of the word.
+2. Get the address from the last three digits of the word.
 3. Fetch the value at that address.
 4. Print it.
 
@@ -153,7 +153,7 @@ Goal: Jump to another instruction.
 
 Steps:
 1. Parse opcode 40.
-2. Get the target address from the last two digits of the word.
+2. Get the target address from the last three digits of the word.
 3. Make sure that address is in range (0–99).
 4. Set memoryLoc to that address so the next instruction comes from there.
 
