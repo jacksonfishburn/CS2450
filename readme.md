@@ -29,7 +29,7 @@ The window shows the accumulator, the instruction pointer, the loaded file name,
 3. If the file is invalid, the file name turns red and **Step** and **Run** stay disabled.
 
 ### Editing a file
-1. Once a file is loaded, the memory can be directly editied through the UI.
+1. Once a file is loaded, the memory can be directly edited through the UI on the left side of the window.
 ### Saving the File
 1. Clicking on the save button will save current memory over the loaded file. The name of the loaded file is displayed.
 ### Running the File
@@ -37,22 +37,24 @@ The window shows the accumulator, the instruction pointer, the loaded file name,
 1. Click **Step** to run one instruction.
 2. Click **Run** to keep running instructions. The button changes to **Pause**. Click it again to pause.
 3. Click **Reset** to stop a run and clear the console.
-4. When a program needs input, a dialog asks for a signed 4-digit integer: `+xxxx` or `-xxxx`, where `x` is a digit from `0` to `9`. Canceling the dialog stops the program.
+4. When a program needs input, a dialog asks for a signed 6-digit integer: `+xxxxxx` or `-xxxxxx`, where `x` is a digit from `0` to `9`. Canceling the dialog stops the program.
 5. Program output is written in the console as `OUTPUT: ...`.
 6. When the program halts, the console shows `Program HALT reached`.
 
 
 ## How to write files for this program to run
 
-1. Create a `.txt` file.
-2. Each line must contain a signed 4-digit integer, as described above. These are called an **instruction**.
-3. The first 2 digits (`+XXxx`) of the **instruction** describe which *operation* to perform.
+1. Create a `.txt` file. This can contain either 4-digit or 6-digit integers. (Must be one or the other, not mixed)
+2. Each line must contain a signed 6-digit integer, as described above. These are called an **instruction**.
+3. The first 3 digits (`+XXXxx`) of the **instruction** describe which *operation* to perform.
     - The sign of the **instruction** has no effect on its function but is conventionally positive.
-4. The third and fourth digits (`+xxXX`) describe which position in memory to *operate* on.
-    - There are 100 memory slots, from `00` through `99`.
+4. The last 3 digits (`+xxXXX`) describe which position in memory to *operate* on.
+    - There are 250 memory slots, from `00` through `249`.
     - A program with `n` instructions occupies slots up to `n-1`.
     - Do not operate on memory slots below `n`.
 5. End the program with the `+4300` **instruction**.
+
+   Note: This program converts 4 digit numbers into 6 digits when the file is run.
 
 ## What are the available operations?
 
