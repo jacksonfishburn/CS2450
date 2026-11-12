@@ -48,6 +48,9 @@ class GUI:
 
         self.is_running = False
 
+        self.open_files = {} 
+        self.current_file = None
+
         self._build_ui()
         self._refresh_display()
 
@@ -58,9 +61,9 @@ class GUI:
         button_color = {"bg": self.off, "fg": "black", "activebackground": self.off, "activeforeground": "black"}
         tk.Button(ctrl_frame, text="Load File", command=self.load_file, **button_color).pack(side=tk.LEFT, padx=5)
         
-        self.btn_step = tk.Button(ctrl_frame, text="Step", command=self.step_execution, state="disabled", **button_color)
+        self.btn_step = tk.Button(ctrl_frame, text="Step", command=self.step_execution, state="normal", **button_color)
         self.btn_step.pack(side=tk.LEFT, padx=5)
-        self.btn_run = tk.Button(ctrl_frame, text="Run", state="disabled", command=self.toggle_run, **button_color)
+        self.btn_run = tk.Button(ctrl_frame, text="Run", state="normal", command=self.toggle_run, **button_color)
         self.btn_run.pack(side=tk.LEFT, padx=5)
 
         tk.Button(ctrl_frame, text="Reset", command=self.reset_sim, **button_color).pack(side=tk.LEFT, padx=5)
@@ -90,8 +93,8 @@ class GUI:
         self.mem_editor = tk.Text(mem_frame, wrap=tk.NONE, undo=True, font=("Consolas", 11))
         self.mem_editor.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        # Initial population of 100 placeholder lines
-        self.mem_editor.insert("1.0", "\n".join(["+0000"] * 100))
+        # Initial population of 1000 placeholder lines
+        self.mem_editor.insert("1.0", "\n".join(["+000000"] * self.cpu.memory_size))
 
         # Scrollbar Syncing (Keeps line numbers and text vertically aligned)
         editor_scroll = ttk.Scrollbar(mem_frame, orient=tk.VERTICAL, command=self.mem_editor.yview)
@@ -115,27 +118,61 @@ class GUI:
         self.line_numbers.delete("1.0", tk.END)
         
         lines = int(self.mem_editor.index('end-1c').split('.')[0])
-        line_num_str = "\n".join([f"{i:02d}" for i in range(max(lines, 100))])
+        line_num_str = "\n".join([f"{i:03d}" for i in range(max(lines, self.cpu.memory_size))])
         
         self.line_numbers.insert("1.0", line_num_str)
         self.line_numbers.config(state='disabled')
 
+    ##self.mem_editor
     def sync_and_validate_memory(self):
-        """Pulls text from the editor, enforces 100 lines, validates, and updates backend."""
+        """Pulls text from the editor, enforces memory_size lines, validates, and updates backend."""
+        # Read directly from single mem_editor widget
         raw_text = [line.strip() for line in self.mem_editor.get("1.0", "end-1c").split('\n')]
-        
-        if len(raw_text) > 100:
-            self.log(f"Warning: Code exceeds 100 lines. Truncating bottom {len(raw_text) - 100} lines.")
-            raw_text = raw_text[:100]
-            self.mem_editor.delete("101.0", tk.END)
+                  
+        # Remove trailing empty lines to prevent artificial padding conflicts
+        while raw_text and not raw_text[-1]:
+            raw_text.pop()
+                           
+        if len(raw_text) > self.cpu.memory_size:
+            self.log(f"Warning: Code exceeds {self.cpu.memory_size} lines. Truncating.")
+            raw_text = raw_text[:self.cpu.memory_size]
+            self.mem_editor.delete(f"{self.cpu.memory_size + 1}.0", tk.END)
             self._update_line_numbers()
-            
-        while len(raw_text) < 100:
-            raw_text.append("+0000")
-            
+                           
+        # Dynamically determine the dominant word length of the actual code
+        dominant_len = 6 # default to 6
+        for line in raw_text:
+            if line and line not in ("+0000", "+000000"):
+                # If a 4-digit word (+XXXX) is detected, switch dominant length to 4
+                if len(line) == 5 or (len(line) == 4 and line[0] not in ('+', '-')):
+                    dominant_len = 4
+                break
+                
+        pad_word = "+0000" if dominant_len == 4 else "+000000"
+        
+        # Sanitize: if a line is just the wrong default padding, auto-replace it to match
+        wrong_pad = "+000000" if dominant_len == 4 else "+0000"
+        for i in range(len(raw_text)):
+            if raw_text[i] == wrong_pad:
+                raw_text[i] = pad_word
+
+        # Pad the rest of the editor with the matching word length
+        while len(raw_text) < self.cpu.memory_size:
+            raw_text.append(pad_word)
+                           
         try:
-            #Backend validation and loading of memory
+            # Backend validation and loading of memory (also converts 4-digit to 6-digit)
             self.cpu.load_memory(raw_text)
+            
+            # Update the open files dictionary if a file is currently active
+            if self.current_file:
+                self.open_files[self.current_file] = [str(w) for w in self.cpu.get_memory()]
+                
+            # Auto-update the GUI editor (shows the 4-to-6 digit conversion visually)
+            self.mem_editor.config(state="normal")
+            self.mem_editor.delete("1.0", tk.END)
+            self.mem_editor.insert("1.0", "\n".join(str(w) for w in self.cpu.get_memory()))
+            
             return True
         except Exception as e:
             self.log(f"Validation Error: {str(e)}")
@@ -183,7 +220,9 @@ class GUI:
             self.root.title(f"UVSim - {filename}")
             
             with open(filepath, "r") as f:
-                lines = [line.strip() for line in f.readlines()]
+                # Replaces any weird formatting/newlines with spaces, then splits into individual words
+                raw_content = f.read()
+                lines = [word.strip() for word in raw_content.replace('\n', ' ').split() if word.strip()]
                 
             self.mem_editor.config(state="normal")
             self.mem_editor.delete("1.0", tk.END)
@@ -256,23 +295,23 @@ class GUI:
             if not self.sync_and_validate_memory():
                 return True
                 
-        # 2. Prevent the simulator from attempting to step past index 99
-        if self.cpu.get_pointer() >= 99:
+        # 2. Prevent stepping past memory limits
+        if self.cpu.get_pointer() >= self.cpu.memory_size - 1:
             self.log("End of memory reached without HALT command. Halting execution.")
             self.is_running = False
             self.btn_run.config(text="Run", state="disabled")
             self.btn_step.config(state="disabled")
             self._refresh_display()
             return True
-            
+                      
         halted = False
         try:
             self.cpu.step()
         except NeedValue as e:
-            raw_data = simpledialog.askstring("Input", f"Enter Valid Signed 4-digit Integer for location {e.location}:", parent=self.root)
-            if raw_data is not None:
+            raw_data = simpledialog.askstring("Input", f"Enter Valid Signed {self.cpu._mem.int_size}-digit Integer for location {e.location:03d}:", parent=self.root)
+            if raw_data is not None and raw_data.strip() != "":
                 try:
-                    self.cpu.set_memory_at(e.location, SignedInt(raw_data))
+                    self.cpu.set_memory_at(e.location, SignedInt(raw_data.strip(), size=self.cpu._mem.int_size))
                 except ValueError as v:
                     self.log(str(v))
                     self.cpu.go_back()
@@ -289,7 +328,7 @@ class GUI:
             self.btn_run.config(text="Run", state="disabled") 
             self.btn_step.config(state="disabled")
             halted = True
-            
-        # 2. Refresh the UI AFTER the CPU has executed the instruction
+                      
+        # 3. Refresh the UI AFTER the CPU has executed the instruction
         self._refresh_display()
         return halted

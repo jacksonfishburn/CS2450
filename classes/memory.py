@@ -81,31 +81,55 @@ class Memory:
             TypeError: If any object being loaded into memory is not an SignedInt
 
         Returns:
-            list[SignedInt]: A list of 100 SignedInt from an initial loaded list
+            list[SignedInt]: A list of SignedInt from an initial loaded list
         """
-        out = []
-        n = 0
         if len(load) > self.size:
-            raise ValueError(f"loaded memory is to long")
-        else:
-            for i in load:
-                try:
-                    new = str(i)
-                except:
-                    raise TypeError(f"{i} of wrong type: {type(i)}")
-                if not new[0] in ('-', '+'):
-                    new = '+' + new
-                while len(new) < self.int_size + 1:
-                    new = list(new)
-                    new.insert(1,'0')
-                    new.insert(4,'0')
-                    new = "".join(new)
-                new = int(new)
-                try:
-                    out.append(SignedInt(new, self.int_size))
-                except:
-                    raise ValueError(f"{i} invalid integer")
-                n += 1
-            for j in range(self.size - len(out)):
-                out.append(SignedInt(size=self.int_size))
+            raise ValueError(f"Loaded memory is too long (max {self.size})")
+        out = []
+        valid_opcodes = {10, 11, 20, 21, 30, 31, 32, 33, 40, 41, 42, 43}
+        detected_len = None
+        
+        for idx, i in enumerate(load):
+            new = str(i).strip()
+            if not new:
+                continue
+            if new[0] not in ('-', '+'):
+                new = '+' + new
+            word_len = len(new) - 1
+            if word_len not in (4, 6):
+                raise ValueError(f"Line {idx}: must be 4 or 6 digits")
+                
+            # Do not allow mixing 4-digit and 6-digit words in the same file
+            if detected_len is None:
+                detected_len = word_len
+            elif detected_len != word_len:
+                raise ValueError(f"Line {idx}: Cannot mix 4-digit and 6-digit words in the same file")
+                
+            # Smart Conversion Rule: 4-digits to 6-digits
+            if self.int_size == 6 and word_len == 4:
+                sign = new[0]
+                first_two = int(new[1:3])
+                                 
+                if sign == '+' and first_two in valid_opcodes:
+                    # Treat as instruction -> +0XX0YY
+                    new = f"+0{new[1:3]}0{new[3:5]}"
+                else:
+                    # Treat as raw number -> +/-00XXXX
+                    new = f"{sign}00{new[1:5]}"
+            try:
+                word_obj = SignedInt(int(new), self.int_size)
+                                 
+                # Reject commands targeting addresses >= 250
+                if word_obj.get_sign() == '+' and word_obj.get_command() in valid_opcodes:
+                    if word_obj.get_command() != 43 and not (0 <= word_obj.get_pointer() < self.size):
+                        raise ValueError(f"Line {idx}: target address {word_obj.get_pointer():03d} out of bounds")
+                                         
+                out.append(word_obj)
+            except Exception:
+                raise ValueError(f"{i} invalid integer")
+                
+        # Pads rest of memory slots with 0s
+        for j in range(self.size - len(out)):
+            out.append(SignedInt(size=self.int_size))
+            
         return out

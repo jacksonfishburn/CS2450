@@ -68,6 +68,8 @@ class UVSim:
                 raise e
             except:
                 raise ValueError(f"Invalid signed int: {new}")
+        else:
+            self._mem.set(location, new)
 
 
     def get_memory(self) -> list[SignedInt]:
