@@ -37,12 +37,12 @@ Steps:
 Actor: User  
 System: InOut.read_input  
 
-Goal: Only accept a valid signed 6-character word (+123456 or -123456).
+Goal: Only accept a valid signed 4 or 6 character word (+123456, +123456, +1234, -1234).
 
 Steps:
 1. Prompt for input.
 2. User types a word that starts with + or -.
-3. Check that the rest is digits and the length is 5.
+3. Check that the rest is digits and the length is 4 or 6.
 4. If it is invalid, ask again until it is valid.
 
 ---
